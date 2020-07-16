@@ -1,21 +1,20 @@
-import path from 'path';
-import express from 'express';
-import logger from 'morgan';
-import bodyParser from 'body-parser';
-import UrlShortner from './controller/api/index.api.controller';
-import { ApiController } from './controller/api/abstract.api.controller';
+import express from 'express'
+import logger from 'morgan'
+import bodyParser from 'body-parser'
+import UrlShortner from './controller/api/index.api.controller'
+import { ApiController } from './controller/api/abstract.api.controller'
 
 // Creates and configures an ExpressJS web server.
 class App {
 
     // ref to Express instance
-    public express: express.Application;
+    public express: express.Application
 
     //Run configuration methods on the Express instance.
     constructor() {
-        this.express = express();
-        this.middleware();
-        this.routes();
+        this.express = express()
+        this.middleware()
+        this.routes()
     }
 
     // Configure Express middleware.
@@ -26,12 +25,12 @@ class App {
                 tokens.url(req, res),
                 tokens.status(req, res),
                 tokens.res(req, res, 'content-length'), '-',
-                tokens['response-time'](req, res), 'ms'
+                tokens['response-time'](req, res), 'ms',
             ].join(' ')
-        })]);
+        })])
 
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
+        this.express.use(bodyParser.json())
+        this.express.use(bodyParser.urlencoded({ extended: false }))
     }
 
     // Configure API endpoints.
@@ -39,13 +38,17 @@ class App {
         /* This is just to get up and running, and to make sure what we've got is
          * working so far. This function will change when we start to add more
          * API endpoints */
-        const apiController : ApiController = new UrlShortner();
-        let router = express.Router();
+        const apiController : ApiController = new UrlShortner()
+        const router = express.Router()
         // placeholder route handler
-        router.get('/', apiController.readOption());
-        this.express.use('/', router);
+        router.get('/', apiController.readOption())
+        router.get('*', apiController.readOption())
+        router.get('/singleurl', apiController.readOption())
+        router.get('/delete/url', apiController.readOption())
+        router.get('/update/url', apiController.readOption())
+        this.express.use('/api/v1', router)
     }
 
 }
 
-export default new App().express;
+export default new App().express
