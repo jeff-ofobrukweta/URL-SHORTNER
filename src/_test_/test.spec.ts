@@ -2,13 +2,6 @@
 import { UserModel } from '../db/model/users.model'
 import faker from 'faker'
 
-
-// beforeEach((done) => {
-//     jest.setTimeout(30000)
-//     done()
-// })
-
-
 describe('User API', () => {
     it('find user', () => {
         async () => {

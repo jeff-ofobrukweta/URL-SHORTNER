@@ -5,6 +5,6 @@ import { IUserDocument, IUserModel } from '../types/users.types'
 import Mongoose from 'mongoose'
 
 export const UserModel = Mongoose.model<IUserDocument>(
-    'user',
+    'url',
     UserSchema
   ) as IUserModel

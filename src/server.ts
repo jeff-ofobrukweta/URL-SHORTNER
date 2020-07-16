@@ -2,7 +2,7 @@ import express from 'express'
 import logger from 'morgan'
 import bodyParser from 'body-parser'
 import UrlShortner from './controller/api/index.api.controller'
-import { ApiController } from './controller/api/abstract.api.controller'
+import rateLimitMiddleware from './middleware/rateLimit.middleware'
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -38,15 +38,16 @@ class App {
         /* This is just to get up and running, and to make sure what we've got is
          * working so far. This function will change when we start to add more
          * API endpoints */
-        const apiController : ApiController = new UrlShortner()
+        const apiController : any = new UrlShortner()
         const router = express.Router()
         // placeholder route handler
-        router.get('/', apiController.readOption())
-        router.get('*', apiController.readOption())
-        router.get('/singleurl', apiController.readOption())
-        router.get('/delete/url', apiController.readOption())
-        router.get('/update/url', apiController.readOption())
+        router.post('/', apiController.createOption())
+        router.get('/fetch', apiController.readOption())
+        // router.get('/delete/url', apiController.readOption())
+        // router.get('/update/url', apiController.readOption())
+        // router.get('*', apiController.readOption())
         this.express.use('/api/v1', router)
+        this.express.use(rateLimitMiddleware())
     }
 
 }

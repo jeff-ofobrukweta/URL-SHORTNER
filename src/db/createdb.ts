@@ -16,7 +16,7 @@ export async function Seed ():Promise<void>{
   ]
   try {
     for (const user of users) {
-      await UserModel.create(user);
+      await UserModel.findOneOrCreate(user)
       console.log(`Created user ${user.firstName} ${user.lastName}`)
     }
     await disconnect()
