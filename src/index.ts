@@ -5,11 +5,7 @@ import App from './server'
 import { connect } from './db/database'
 
 
-
-
-
-
-(async function Bootstrap(): Promise<void> {
+async function Bootstrap(): Promise<void> {
   debug('ts-express:server')
 
   const port: number | string | boolean = normalizePort(process.env.PORT || 3000)

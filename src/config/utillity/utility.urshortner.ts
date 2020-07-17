@@ -114,8 +114,8 @@ export class Base64 extends ABase64 {
         return string
     }
 
-    // private method for UTF-8 encoding
-    public utf8_encode(string:string) {
+    // protected method for UTF-8 encoding
+    protected utf8_encode(string:string) {
         string = string.replace(/\r\n/g, '\n')
         let utftext = ''
 

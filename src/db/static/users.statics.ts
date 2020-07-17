@@ -1,4 +1,4 @@
-import { IUserDocument, IUserModel } from '../types/users.types'
+import { IUserDocument, IUserModel } from '../types/users.types.td'
 
 export async function findOneOrCreate(this: IUserModel, user:any): Promise<IUserDocument> {
 

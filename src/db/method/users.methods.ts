@@ -1,5 +1,5 @@
 import { Document } from 'mongoose'
-import { IUserDocument } from '../types/users.types'
+import { IUserDocument } from '../types/users.types.td'
 export async function setLastUpdated(this: IUserDocument): Promise<void> {
     const now = new Date()
     if (!this.lastUpdated || this.lastUpdated < now) {

@@ -19,7 +19,8 @@ class App {
 
     // Configure Express middleware.
     private middleware(): void {
-        this.express.use([logger('combined'),logger(':method :url :status :res[content-length] - :response-time ms'),logger((tokens, req, res) => {
+        this.express.use([logger('combined'),
+        logger(':method :url :status :res[content-length] - :response-time ms'), logger((tokens, req, res) => {
             return [
                 tokens.method(req, res),
                 tokens.url(req, res),
@@ -31,6 +32,7 @@ class App {
 
         this.express.use(bodyParser.json())
         this.express.use(bodyParser.urlencoded({ extended: false }))
+        this.express.use(rateLimitMiddleware()) //this is to help throtttling
     }
 
     // Configure API endpoints.
@@ -38,7 +40,7 @@ class App {
         /* This is just to get up and running, and to make sure what we've got is
          * working so far. This function will change when we start to add more
          * API endpoints */
-        const apiController : any = new UrlShortner()
+        const apiController: any = new UrlShortner()
         const router = express.Router()
         // placeholder route handler
         router.post('/', apiController.createOption())
@@ -47,7 +49,7 @@ class App {
         // router.get('/update/url', apiController.readOption())
         // router.get('*', apiController.readOption())
         this.express.use('/api/v1', router)
-        this.express.use(rateLimitMiddleware())
+
     }
 
 }
