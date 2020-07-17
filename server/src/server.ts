@@ -3,6 +3,7 @@ import logger from 'morgan'
 import bodyParser from 'body-parser'
 import UrlShortner from './controller/api/index.api.controller'
 import rateLimitMiddleware from './middleware/rateLimit.middleware'
+import cors from 'cors'
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -20,7 +21,8 @@ class App {
     // Configure Express middleware.
     private middleware(): void {
         this.express.use([logger('combined'),
-        logger(':method :url :status :res[content-length] - :response-time ms'), logger((tokens, req, res) => {
+        logger(':method :url :status :res[content-length] - :response-time ms'),
+        logger((tokens, req, res) => {
             return [
                 tokens.method(req, res),
                 tokens.url(req, res),
@@ -29,7 +31,7 @@ class App {
                 tokens['response-time'](req, res), 'ms',
             ].join(' ')
         })])
-
+        this.express.use(cors())
         this.express.use(bodyParser.json())
         this.express.use(bodyParser.urlencoded({ extended: false }))
         this.express.use(rateLimitMiddleware()) //this is to help throtttling
