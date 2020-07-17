@@ -47,7 +47,7 @@ class App {
         router.get('/fetch', apiController.readOption())
         // router.get('/delete/url', apiController.readOption())
         // router.get('/update/url', apiController.readOption())
-        // router.get('*', apiController.readOption())
+        // router.get('*')
         this.express.use('/api/v1', router)
 
     }

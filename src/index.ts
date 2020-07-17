@@ -42,7 +42,7 @@ async function Bootstrap(): Promise<void> {
   }
 
   function onListening() {
-    const addr = server.address()
+    const addr:any = server.address()
     if (addr) {
       const bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port || 3000}`
       debug(`Listening on ${bind}`)
@@ -50,4 +50,4 @@ async function Bootstrap(): Promise<void> {
   }
 }
 
-Bootstrap();
+Bootstrap()
