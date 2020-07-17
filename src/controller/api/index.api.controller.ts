@@ -12,11 +12,15 @@ class UrlShortner extends ApiController {
         return async (req: any, res: any, next: any) => {
             try {
                 const result = await UserModel.find()
-                await res.json({ result })
+                res.status(200).send({ result })
+                return
             } catch (err) {
-                throw new Error(err)
+                res.status(500).send({ message: err, internalcode: '00' })
+                return
             }
+            return 
         }
+        return
     }
 
     createOption() {
