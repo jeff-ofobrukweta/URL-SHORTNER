@@ -1,12 +1,20 @@
-import Redis from "ioredis";
+import Redis from 'ioredis'
 
-export const redis = new Redis({
-    host:"localhost",
-    port:6379,
-    connectTimeout: 22000,
-    maxRetriesPerRequest: 4,
-    retryStrategy: (times:any) => Math.min(times * 30, 1000),
+
+
+const port = 6379
+const host='localhost'
+const connectTimeout = 22000
+const maxRetriesPerRequest = 4
+
+
+const redis = new Redis({
+    host:host,
+    port:port,
+    connectTimeout: connectTimeout,
+    maxRetriesPerRequest: maxRetriesPerRequest,
+    retryStrategy: (times:number) => Math.min(times * 30, 1000),
   }
-);
+)
 
-export default redis;
+export default redis

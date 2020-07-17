@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 
 export abstract class CrudController {
-    public abstract createOption(req: Request, res: Response): void;
-    public abstract readOption(req: Request, res: Response): void;
-    public abstract updateOption(req: Request, res: Response): void;
-    public abstract deleteOption(req: Request, res: Response): void;
+    public abstract createOption(req: Request, res: Response): void
+    public abstract readOption(req: Request, res: Response): void
+    public abstract updateOption(req: Request, res: Response): void
+    public abstract deleteOption(req: Request, res: Response): void
 }
