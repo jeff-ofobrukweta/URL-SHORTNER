@@ -1,4 +1,5 @@
-import redis from "../../../../Desktop/typargoconfig/src/config/redis";
+import redis from "../config/redis";
+
 
 // ioredis supports all Redis commands:
 export const setOption = async (key: string, value: any)=> {

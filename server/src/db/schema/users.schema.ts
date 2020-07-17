@@ -3,11 +3,11 @@ import { findOneOrCreate, findByAge } from '../static/users.statics'
 import { setLastUpdated, sameLastName } from '../method/users.methods'
 
 const UserSchema = new Schema({
-  firstName: String,
-  lastName: String,
-  age: Number,
-  shortUrl:String,
-  longUrl:String,
+  firstName: { type: String, required: false },
+  lastName: { type: String, required: false },
+  age: { type: Number, required: false },
+  shortUrl: { type: String, required: true },
+  longUrl: { type: String, required: true },
   dateOfEntry: {
     type: Date,
     default: new Date(),
