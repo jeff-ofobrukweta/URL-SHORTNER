@@ -1,8 +1,21 @@
 <template>
   <div class="home">
-    <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
     <div class="main">
-      <div class="header"></div>
+      <div class="header">
+        <button @mouseover="hover = true"  class="headerbtn">History</button>
+        <ul @mouseover="hover = true" @mouseleave="hover = false" v-if="hover" class="main_list">
+          <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
+            <div>{{value.shortUrl}}</div>
+            <img class="bin" width="80px" :src="require('@/icons/recycle-bin.svg')" alt="bin" />
+          </li>
+          <li class="item">
+            <button class="btn-container-main">
+              <button class="buttton">❮</button>
+              <button class="buttton">❯</button>
+            </button>
+          </li>
+        </ul>
+      </div>
       <div class="primary">
         <input class="urlInput" type="text" placeholder="Paste your link here..." />
         <button class="submit urlButton">Submit</button>
@@ -27,19 +40,25 @@ export default {
   name: "Home",
   data() {
     return {
-      pageData: { page: 1 }
+      pageData: { page: 1 },
+      hover: false
     };
   },
   components: {},
   async mounted() {
-    this.GET_URL_LIST_SUMMARY(this.pageData)
+    this.GET_URL_LIST_SUMMARY(this.pageData);
+    this.mounting();
   },
   computed: {
     ...mapGetters(["getAllUrl"])
   },
   methods: {
     ...mapActions(["GET_URL_LIST_SUMMARY"]),
-    ...mapMutations(["SET_URL_SUMMARY"])
+    ...mapMutations(["SET_URL_SUMMARY"]),
+
+    mounting() {
+      return;
+    }
   }
 };
 </script>
@@ -55,6 +74,21 @@ export default {
 body {
   margin: 0;
 }
+.bin {
+  width: 20px;
+  cursor: pointer;
+}
+.headerbtn {
+  margin: 25px 10px;
+  border: 0px;
+  outline: none;
+  padding: 8px 10px;
+  border-radius: 18px;
+  background-color: #0077cc;
+  cursor: pointer;
+  color: #fff;
+  text-transform: uppercase;
+}
 
 .main {
   font-family: "Roboto", sans-serif;
@@ -66,6 +100,7 @@ body {
 }
 
 .header {
+  position: relative;
   background-color: #222;
   color: white;
   text-align: center;
@@ -73,6 +108,41 @@ body {
   grid-template-columns: 1fr 10fr 1fr;
   grid-template-rows: 5fr 4fr;
   align-items: center;
+}
+.main_list {
+  position: absolute;
+  left: 6px;
+  top: 50px;
+  list-style: none;
+  padding: 10px;
+  width: 80%;
+  text-align: left;
+  box-shadow: 0 7px 64px rgba(31, 32, 65, 0.1);
+  transition: all 0.3s ease;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #000;
+}
+
+.btn-container-main {
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.buttton {
+  color: black;
+  float: left;
+  padding: 8px 20px;
+  text-decoration: none;
+}
+.item {
+  margin: 5px 0px;
+  display: flex;
+  padding: 7px;
+  justify-content: space-between;
 }
 
 .header h2 {
@@ -91,7 +161,7 @@ body {
 }
 
 .primary {
-  background-color: #465f5f;
+  background-color: transparent;
   display: grid;
   grid-template-columns: 1fr 6fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;

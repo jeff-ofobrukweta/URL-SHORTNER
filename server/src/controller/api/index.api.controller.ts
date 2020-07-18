@@ -13,7 +13,7 @@ class UrlShortner extends ApiController {
             try {
 
                 // Declaring variable
-                const resPerPage = 4 // results per page
+                const resPerPage = 10 // results per page
                 const page = Number(req.query.page) || 1 // Page defensive programming here
 
                 if (!(page <= 0)) {

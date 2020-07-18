@@ -1,16 +1,15 @@
 import { IUserDocument, IUserModel } from '../types/users.types.td'
 
-export async function findOneOrCreate(this: IUserModel, user:any): Promise<IUserDocument> {
+export async function findOneOrCreate(this: IUserModel, user: any): Promise<IUserDocument> {
 
     const record = await this.findOne(user)
     if (record) {
         return record
-    } 
+    }
     else {
         return await this.create(user) // check this later
     }
 }
-
 export async function findByAge(
     this: IUserModel,
     min?: number,
