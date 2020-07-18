@@ -2,7 +2,7 @@
   <div class="home">
     <div class="main">
       <div class="header">
-        <button @mouseover="hover = true"  class="headerbtn">History</button>
+        <button @mouseover="hover = true" class="headerbtn">History</button>
         <ul @mouseover="hover = true" @mouseleave="hover = false" v-if="hover" class="main_list">
           <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
             <div>{{value.shortUrl}}</div>
@@ -34,7 +34,6 @@
 <script>
 // @ is an alias to /src
 import { mapGetters, mapActions, mapMutations } from "vuex";
-import axiosInstance from "../utility/api.utility";
 
 export default {
   name: "Home",
@@ -57,6 +56,15 @@ export default {
     ...mapMutations(["SET_URL_SUMMARY"]),
 
     mounting() {
+      return;
+    },
+    deleting() {
+      return;
+    },
+    creating() {
+      return;
+    },
+    fetching() {
       return;
     }
   }
