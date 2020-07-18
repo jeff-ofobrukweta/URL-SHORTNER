@@ -11,41 +11,66 @@ class UrlShortner extends ApiController {
     readOption() {
         return async (req: any, res: any, next: any) => {
             try {
-                const result = await UserModel.find()
-                res.status(200).send({ result })
+
+                // Declaring variable
+                const resPerPage = 4 // results per page
+                const page = Number(req.query.page) || 1 // Page defensive programming here
+
+                if (!(page <= 0)) {
+                    const result = await UserModel.find()
+                        .skip((resPerPage * page) - resPerPage)
+                        .limit(resPerPage)
+                    // Count how many products were found
+                    const numOfRecords = await UserModel.countDocuments({});
+
+                    res.status(200).send({
+                        records: result,
+                        currentPage: page,
+                        pages: Math.ceil(numOfRecords / resPerPage),
+                        numOfResults: numOfRecords,
+                    })
+                }
                 return
             } catch (err) {
                 res.status(500).send({ message: err, internalcode: '00' })
                 return
             }
-            return 
         }
-        return
     }
 
     createOption() {
         return async (req: any, res: any, next: any) => {
             try {
-                const baseUrl = 'https://pbid.io/'
-                req.body.shortUrl = baseUrl + new Base64().encode()
+                req.body.shortUrl = `https://pbid.io/${new Base64().encode()}`
                 const result = await UserModel.create(req.body)
                 await res.json({ result })
                 next()
+                return
             } catch (err) {
+                res.status(500).send({ message: err, internalcode: '00' })
                 throw new Error(err)
             }
         }
-        return
     }
-    updateOption() {
-        console.log('Generating url reports...')
-        return async () => {
 
+    deleteOption() {
+        return async (req: any, res: any, next: any) => {
+            try {
+                await UserModel.findByIdAndRemove(req.query.id, (err) => {
+                    if (err) return next(err);
+                    res.status(201).send({
+                        message: 'Deleted Report successfully!',
+                        internalcode: '01',
+                    });
+                    next()
+                    return
+                })
+                return
+            } catch (err) {
+                res.status(500).send({ message: err, internalcode: '00' })
+                throw new Error(err)
+            }
         }
-    }
-    deleteOption(): void {
-        console.log('Deleting url reports...')
-        return
     }
 }
 

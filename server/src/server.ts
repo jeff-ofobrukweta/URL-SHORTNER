@@ -38,13 +38,14 @@ class App {
     }
 
     // Configure API endpoints.
-    private routes(): void {
+    private routes() {
         /* This is can be read from an external js module dynamically but cos its just few end-points ill leave it this way*/
         const apiController: any = new UrlShortner()
         const router = express.Router()
         // placeholder route handler
         router.post('/', apiController.createOption())
         router.get('/fetch', apiController.readOption())
+        router.delete('/remove', apiController.deleteOption())
         // router.get('*')
         this.express.use('/api/v1', router)
 
