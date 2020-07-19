@@ -41,10 +41,13 @@ class UrlShortner extends ApiController {
     createOption() {
         return async (req: any, res: any, next: any) => {
             try {
-                req.body.shortUrl = `https://pbid.io/${new Base64().encode()}`
-                const result = await UserModel.create(req.body)
-                await res.json({ result })
-                next()
+                if (req.body.longUrl) {
+                    req.body.shortUrl = `https://pbid.io/${new Base64().encode()}`
+                    const result = await UserModel.create(req.body)
+                    await res.status(201).send({ result })
+                    next()
+                    return
+                }
                 return
             } catch (err) {
                 res.status(500).send({ message: err, internalcode: '00' })

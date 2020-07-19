@@ -6,7 +6,7 @@
         <ul @mouseover="hover = true" @mouseleave="hover = false" v-if="hover" class="main_list">
           <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
             <div>{{value.shortUrl}}</div>
-            <img class="bin" width="80px" :src="require('@/icons/recycle-bin.svg')" alt="bin" />
+            <img class="bin" :src="require('@/icons/recycle-bin.svg')" alt="bin" />
           </li>
           <li class="item">
             <button class="btn-container-main">
@@ -17,8 +17,23 @@
         </ul>
       </div>
       <div class="primary">
-        <input class="urlInput" type="text" placeholder="Paste your link here..." />
-        <button class="submit urlButton">Submit</button>
+        <input
+          v-model="body.longUrl"
+          class="urlInput"
+          type="text"
+          placeholder="Paste your link here..."
+        />
+        <button @click="creating" class="submit urlButton">
+          <div>Submit</div>
+          <img class="checklist" :src="require('@/icons/checklist.svg')" alt="bin" />
+        </button>
+        <div class="results_dialogue">
+          <div class="main_dialogue">
+            Brown acetate glasses from Moscot,This rounder,
+            <div>nerdier number has served as the calling card for generations of creative, thoughtful,</div>
+            <div>free-spirited intellectuals and renowned artists.</div>
+          </div>
+        </div>
         <div class="results hidden">
           <button class="copy urlButton">Copy</button>
         </div>
@@ -40,6 +55,12 @@ export default {
   data() {
     return {
       pageData: { page: 1 },
+      body: {
+        firstName: "Test Account",
+        lastName: "testing",
+        age: 0,
+        longUrl: null
+      },
       hover: false
     };
   },
@@ -49,10 +70,10 @@ export default {
     this.mounting();
   },
   computed: {
-    ...mapGetters(["getAllUrl"])
+    ...mapGetters(["getAllUrl", "getsingleUrl"])
   },
   methods: {
-    ...mapActions(["GET_URL_LIST_SUMMARY"]),
+    ...mapActions(["GET_URL_LIST_SUMMARY", "POST_URL_SUMMARY"]),
     ...mapMutations(["SET_URL_SUMMARY"]),
 
     mounting() {
@@ -61,7 +82,8 @@ export default {
     deleting() {
       return;
     },
-    creating() {
+    async creating() {
+      await this.POST_URL_SUMMARY(this.body);
       return;
     },
     fetching() {
@@ -82,9 +104,24 @@ export default {
 body {
   margin: 0;
 }
+
 .bin {
   width: 20px;
   cursor: pointer;
+}
+.checklist {
+  width: 20px;
+  cursor: pointer;
+}
+.results_dialogue {
+  position: absolute;
+  width: 100%;
+  font-size: 13px;
+  text-align: center;
+}
+.main_dialogue {
+  background: #ececec;
+  padding: 10px;
 }
 .headerbtn {
   margin: 25px 10px;
@@ -201,8 +238,17 @@ body {
 }
 
 .submit {
-  background-color: #0077cc;
-  color: #fff;
+  background-color: #ececec;
+  color: #222222;
+  outline: none;
+  display: flex;
+  max-width: 96px;
+  align-items: center;
+}
+.submit:hover {
+  background-color: transparent;
+  border: 0.69px solid #0077cc;
+  color: #0077cc;
 }
 .results {
   grid-area: 1/3/2/4;

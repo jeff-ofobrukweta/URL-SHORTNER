@@ -2,10 +2,10 @@ import Redis from 'ioredis'
 
 
 
-const port = 6379
-const host='localhost'
-const connectTimeout = 22000
-const maxRetriesPerRequest = 4
+const port:number = 6379
+const host:string='localhost'
+const connectTimeout:number = 22000
+const maxRetriesPerRequest:number = 4
 
 
 const redis = new Redis({
@@ -13,7 +13,7 @@ const redis = new Redis({
     port:port,
     connectTimeout: connectTimeout,
     maxRetriesPerRequest: maxRetriesPerRequest,
-    retryStrategy: (times:number) => Math.min(times * 30, 1000),
+    retryStrategy: (times:number):number => Math.min(times * 30, 1000),
   }
 )
 
