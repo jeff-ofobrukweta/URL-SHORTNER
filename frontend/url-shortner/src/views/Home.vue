@@ -2,18 +2,33 @@
   <div class="home">
     <div class="main">
       <div class="header">
-        <button @mouseover="hover = true" class="headerbtn">History</button>
-        <ul @mouseover="hover = true" @mouseleave="hover = false" v-if="hover" class="main_list">
-          <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
-            <div>{{value.shortUrl}}</div>
-            <img class="bin" :src="require('@/icons/recycle-bin.svg')" alt="bin" />
-          </li>
+        <button @click="hover = !hover" class="headerbtn">History</button>
+        <ul v-if="hover" class="main_list">
+          <ul class="inner-list" v-if="!getloading">
+            <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
+              <div>{{value.shortUrl}}</div>
+              <img class="bin" :src="require('@/icons/recycle-bin.svg')" alt="bin" />
+            </li>
+          </ul>
           <li class="item">
             <button class="btn-container-main">
-              <button class="buttton">❮</button>
-              <button class="buttton">❯</button>
+              <button
+                @click="()=>pagination(pageData.prev)"
+                :disabled="getloading || (this.pageData.page == 1)"
+                :class="[isactivePrev ? 'disableClass' : '', 'buttton']"
+              >❮</button>
+              <button
+                @click="()=>pagination(pageData.next)"
+                :disabled="getloading || (this.pageData.page == this.getAllUrl.pages)"
+               :class="[isactiveNext ? 'disableClass' : '', 'buttton']"
+              >❯</button>
             </button>
           </li>
+          <ul v-if="getloading">
+            <li>
+              <img class="loader" :src="require('@/assets/loading.svg')" alt="loading" />
+            </li>
+          </ul>
         </ul>
       </div>
       <div class="primary">
@@ -23,7 +38,7 @@
           type="text"
           placeholder="Paste your link here..."
         />
-        <button @click="creating" class="submit urlButton">
+        <button :disabled="checkInput" @click="creating" class="submit urlButton">
           <div>Submit</div>
           <img class="checklist" :src="require('@/icons/checklist.svg')" alt="bin" />
         </button>
@@ -54,42 +69,79 @@ export default {
   name: "Home",
   data() {
     return {
-      pageData: { page: 1 },
+      pageData: { page: 1, prev: "<", next: ">" },
       body: {
         firstName: "Test Account",
         lastName: "testing",
         age: 0,
-        longUrl: null
+        longUrl: null,
       },
-      hover: false
+      hover: false,
     };
   },
   components: {},
   async mounted() {
-    this.GET_URL_LIST_SUMMARY(this.pageData);
-    this.mounting();
+    this.pagination();
   },
   computed: {
-    ...mapGetters(["getAllUrl", "getsingleUrl"])
+    ...mapGetters(["getAllUrl", "getsingleUrl", "getloading"]),
+    checkInput(){
+      const result = !this.body.longUrl || (this.body.longUrl == null) || (this.body.longUrl == '')
+      return result;
+    },
+    isactiveNext(){
+      const condition = this.getloading || (this.pageData.page == this.getAllUrl.pages)
+      return condition;
+    },
+    isactivePrev(){
+      const condition = this.getloading || (this.pageData.page == 1)
+      return condition;
+    },
   },
   methods: {
     ...mapActions(["GET_URL_LIST_SUMMARY", "POST_URL_SUMMARY"]),
-    ...mapMutations(["SET_URL_SUMMARY"]),
+    ...mapMutations(["SET_URL_SUMMARY", "SET_LOADER"]),
 
-    mounting() {
-      return;
-    },
     deleting() {
       return;
     },
+    async pagination(value) {
+      try {
+        if (this.pageData.page <= this.getAllUrl.pages) {
+          if (value == ">" && this.pageData.page < this.getAllUrl.pages) {
+            this.SET_LOADER(true);
+            this.pageData.page = this.pageData.page + 1; // or this.pageData.page ++
+            await this.GET_URL_LIST_SUMMARY(this.pageData);
+            this.SET_LOADER(false);
+            return;
+          }
+          if (value == "<" && this.pageData.page > 1) {
+            this.SET_LOADER(true);
+            this.pageData.page = this.pageData.page - 1; // or this.pageData.page--
+            await this.GET_URL_LIST_SUMMARY(this.pageData);
+            this.SET_LOADER(false);
+            return;
+          }
+        } else {
+          this.SET_LOADER(true);
+          await this.GET_URL_LIST_SUMMARY(this.pageData);
+          this.SET_LOADER(false);
+          return;
+        }
+        return;
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
     async creating() {
       await this.POST_URL_SUMMARY(this.body);
+      this.body.longUrl = this.getsingleUrl.result.shortUrl;
       return;
     },
     fetching() {
       return;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -106,12 +158,19 @@ body {
 }
 
 .bin {
-  width: 20px;
+  width: 16px;
   cursor: pointer;
+}
+.loader {
+  width: 3rem;
+  margin: 0px 50%;
 }
 .checklist {
   width: 20px;
   cursor: pointer;
+}
+.inner-list {
+  margin-left: -40px;
 }
 .results_dialogue {
   position: absolute;
@@ -160,6 +219,7 @@ body {
   top: 50px;
   list-style: none;
   padding: 10px;
+  z-index: 2000;
   width: 80%;
   text-align: left;
   box-shadow: 0 7px 64px rgba(31, 32, 65, 0.1);
@@ -235,6 +295,11 @@ body {
   max-width: 80px;
 
   border: none;
+}
+
+
+.disableClass{
+  cursor: not-allowed;
 }
 
 .submit {

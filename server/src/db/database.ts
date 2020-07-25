@@ -1,13 +1,12 @@
 import Mongoose from 'mongoose'
 import { UserModel } from './model/users.model'
+import {uri} from './config/db.config'
 
 
 let database: Mongoose.Connection
 export const connect = async () => {
     try {
         // add your own uri below
-        const uri = 'mongodb+srv://upwork:october3119931@cluster0-bzpdm.mongodb.net/Databasev1?retryWrites=true&w=majority'
-
         if (database) {
             return
         }

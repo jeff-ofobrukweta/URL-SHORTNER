@@ -3,7 +3,7 @@ import RedisStore from 'rate-limit-redis'
 import redis from '../config/redis'
 
 
-const rateLimitRequest = Number(process.env.RATE_LIMIT_TIME) || 15
+const rateLimitRequest = Number(process.env.RATE_LIMIT_TIME) || 30
 const rateLimitTime = Number(process.env.RATE_LIMIT_REQUEST) || 100
 const statusCode = 429
 

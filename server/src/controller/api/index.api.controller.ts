@@ -35,6 +35,7 @@ class UrlShortner extends ApiController {
                 res.status(500).send({ message: err, internalcode: '00' })
                 return
             }
+            return
         }
     }
 
@@ -44,7 +45,8 @@ class UrlShortner extends ApiController {
                 if (req.body.longUrl) {
                     req.body.shortUrl = `https://pbid.io/${new Base64().encode()}`
                     const result = await UserModel.create(req.body)
-                    await res.status(201).send({ result })
+                    const appendedmessage = { message: 'Created successfully', internalcode:101 }
+                    await res.status(201).send({result, appendedmessage })
                     next()
                     return
                 }
