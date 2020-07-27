@@ -1,0 +1,50 @@
+version: '3'
+volumes:
+  url-app:
+    external: true
+
+services:
+  app:
+    container_name: url-app
+    build:
+      context: ../../..
+      dockerfile: Dockerfile
+    links:
+      - database
+      - redis
+    volumes:
+      - /usr/app/node_modules
+      - ../../:/usr/app
+    ports:
+      - '5000:5000'
+    env_file:
+      - ../../.env
+    environment:
+      PORT: 5000
+      MONGO_URI: mongodb://url-db:27017/testdb'
+      REDIS_URL: redis://redis:6379
+    command:
+      - yarn
+      - start:dev
+    depends_on:
+      - database
+      - redis
+  database:
+    container_name: url-db
+    image: mongo
+    expose:
+      - '27017'
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data:/data/db
+    healthcheck:
+      test: ['CMD-SHELL', 'curl', '-f', 'mongo:27017']
+      interval: 5s
+      timeout: 10s
+      retries: 5
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - '6379:6379'
