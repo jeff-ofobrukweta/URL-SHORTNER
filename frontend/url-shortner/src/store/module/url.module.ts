@@ -3,7 +3,10 @@ import api from '../../utility/api.utility'
 
 const state = {
   urlSummary: {},
-  urlDetails: {},
+  urlDetails: {
+    appendedmessage:{},
+    result:{},
+  },
   networkErrormessages:'',
 }
 
@@ -54,13 +57,16 @@ const actions = {
       (resp) => {
         if (resp.status >= 200 && resp.status < 400) {
           commit('SET_CREATED_URL', resp.data)
+          commit('SET_CREATE_LOADER',false)
           resolve(true)
           return true
         }
         resolve(false)
+        commit('SET_CREATE_LOADER',false)
       },
       (err) => {
         resolve(false)
+        commit('SET_CREATE_LOADER',false)
         throw new Error(err)
       }
     ));

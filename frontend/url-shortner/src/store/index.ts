@@ -9,14 +9,19 @@ const debug = process.env.VUE_APP_NODE_ENV !== 'production';
 // basse state , mutations and actions leave here ...
 export default new Vuex.Store({
     state: {
-        loader:true,
+        loader:false,
+        createloding:false,
     },
     getters: {
         getloading: (state: any) => state.loader,
+        getcreateloading: (state: any) => state.createloding,
     },
     mutations: {
         SET_LOADER(state: any, boolstate: boolean) {
             state.loader = boolstate
+        },
+        SET_CREATE_LOADER(state: any, loading: boolean) {
+            state.createloding = loading
         },
     },
     modules: {

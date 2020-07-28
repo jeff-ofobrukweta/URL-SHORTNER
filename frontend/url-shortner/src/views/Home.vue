@@ -6,7 +6,9 @@
         <ul v-if="hover" class="main_list">
           <ul class="inner-list" v-if="!getloading">
             <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
-              <div>{{value.shortUrl}}</div>
+              <div class="truncate-word">{{value.shortUrl}}</div>
+              <div class="list-err-msg">unable to connect to server</div>
+              <img class="bin-loader" :src="require('@/assets/loading.svg')" alt="loading" />
               <img class="bin" :src="require('@/icons/recycle-bin.svg')" alt="bin" />
             </li>
           </ul>
@@ -20,7 +22,7 @@
               <button
                 @click="()=>pagination(pageData.next)"
                 :disabled="getloading || (this.pageData.page == this.getAllUrl.pages)"
-               :class="[isactiveNext ? 'disableClass' : '', 'buttton']"
+                :class="[isactiveNext ? 'disableClass' : '', 'buttton']"
               >❯</button>
             </button>
           </li>
@@ -38,20 +40,26 @@
           type="text"
           placeholder="Paste your link here..."
         />
-        <button :disabled="checkInput" @click="creating" class="submit urlButton">
+        <button :disabled="checkInput" @click="creating" :class="[checkInput ? 'disableClass' : '', 'submit urlButton']">
           <div>Submit</div>
-          <img class="checklist" :src="require('@/icons/checklist.svg')" alt="bin" />
+          <img v-if="!showChecklist" class="checklist" :src="require('@/icons/checklist.svg')" alt="check" />
         </button>
         <div class="results_dialogue">
           <div class="main_dialogue">
-            Brown acetate glasses from Moscot,This rounder,
-            <div>nerdier number has served as the calling card for generations of creative, thoughtful,</div>
-            <div>free-spirited intellectuals and renowned artists.</div>
+            <div v-if="getsingleUrl">{{getsingleUrl.appendedmessage.message}}</div>
+            <div v-else></div>
           </div>
         </div>
         <div class="results hidden">
           <button class="copy urlButton">Copy</button>
         </div>
+        <img
+          v-if="getcreateloading"
+          style="width: 50px;"
+          class="clear"
+          :src="require('@/assets/loading.svg')"
+          alt="loading"
+        />
         <a href="#" class="clear hidden">Clear</a>
       </div>
       <div class="footer">
@@ -84,23 +92,32 @@ export default {
     this.pagination();
   },
   computed: {
-    ...mapGetters(["getAllUrl", "getsingleUrl", "getloading"]),
-    checkInput(){
-      const result = !this.body.longUrl || (this.body.longUrl == null) || (this.body.longUrl == '')
+    ...mapGetters(["getAllUrl", "getsingleUrl", "getloading","getcreateloading"]),
+    checkInput() {
+      // check if it empty and if its a valid url
+      const result =
+        !this.body.longUrl ||
+        this.body.longUrl == null ||
+        this.body.longUrl == "";
       return result;
     },
-    isactiveNext(){
-      const condition = this.getloading || (this.pageData.page == this.getAllUrl.pages)
+    isactiveNext() {
+      const condition =
+        this.getloading || this.pageData.page == this.getAllUrl.pages;
       return condition;
     },
-    isactivePrev(){
-      const condition = this.getloading || (this.pageData.page == 1)
+    isactivePrev() {
+      const condition = this.getloading || this.pageData.page == 1;
       return condition;
     },
+    showChecklist(){
+     const result =  !(this.getsingleUrl.appendedmessage.internalcode) || this.checkInput
+     return result
+    }
   },
   methods: {
     ...mapActions(["GET_URL_LIST_SUMMARY", "POST_URL_SUMMARY"]),
-    ...mapMutations(["SET_URL_SUMMARY", "SET_LOADER"]),
+    ...mapMutations(["SET_URL_SUMMARY", "SET_LOADER","SET_CREATE_LOADER"]),
 
     deleting() {
       return;
@@ -134,9 +151,17 @@ export default {
       }
     },
     async creating() {
-      await this.POST_URL_SUMMARY(this.body);
-      this.body.longUrl = this.getsingleUrl.result.shortUrl;
-      return;
+      this.SET_CREATE_LOADER(true);
+      await this.POST_URL_SUMMARY(this.body)
+        .then(() => {
+          this.SET_CREATE_LOADER(false);
+          this.body.longUrl = this.getsingleUrl.result.shortUrl;
+          return;
+        })
+        .catch((err) => {
+          this.SET_CREATE_LOADER(false);
+          throw new Error(err);
+        });
     },
     fetching() {
       return;
@@ -156,6 +181,15 @@ export default {
 body {
   margin: 0;
 }
+.list-err-msg{
+  width: 11rem;
+    font-size: 11px;
+    color: red;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .bin {
   width: 16px;
@@ -164,6 +198,15 @@ body {
 .loader {
   width: 3rem;
   margin: 0px 50%;
+}
+.bin-loader {
+  width: 30px;
+}
+.truncate-word {
+  width: 11rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .checklist {
   width: 20px;
@@ -297,8 +340,7 @@ body {
   border: none;
 }
 
-
-.disableClass{
+.disableClass {
   cursor: not-allowed;
 }
 
