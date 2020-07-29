@@ -4,15 +4,17 @@ import api from '../../utility/api.utility'
 const state = {
   urlSummary: {},
   urlDetails: {
-    appendedmessage:{},
-    result:{},
+    appendedmessage: {},
+    result: {},
   },
-  networkErrormessages:'',
+  deletedurl: {},
+  networkErrormessages: '',
 }
 
 const getters = {
   getAllUrl: (state: any) => state.urlSummary,
   getsingleUrl: (state: any) => state.urlDetails,
+  deletesingleUrl: (state: any) => state.deletedurl,
   getErrorNetworkmessages: (state: any) => state.networkErrormessages,
 }
 
@@ -22,6 +24,9 @@ const mutations = {
   },
   SET_CREATED_URL(state: any, url: any) {
     state.urlDetails = url
+  },
+  SET_DELETED_URL(state: any, deletedurl: any) {
+    state.deletedurl = deletedurl
   },
   NETWORK_ERROR_MESSAGES(state: any, value: any) {
     state.networkErrormessages = value
@@ -36,7 +41,7 @@ const actions = {
         // init loader state == false 
         if (resp.status >= 200 && resp.status < 400) {
           commit('SET_URL_SUMMARY', resp.data)
-          commit('SET_LOADER',false)
+          commit('SET_LOADER', false)
           // mutation here for showing completed loader state 
           resolve(true)
           return true
@@ -46,7 +51,7 @@ const actions = {
       (err) => {
         commit('NETWORK_ERROR_MESSAGES', err)
         // mutation here for showing rejected loader state
-        commit('SET_LOADER',false)
+        commit('SET_LOADER', false)
         resolve(false)
         throw new Error(err)
       }
@@ -57,16 +62,35 @@ const actions = {
       (resp) => {
         if (resp.status >= 200 && resp.status < 400) {
           commit('SET_CREATED_URL', resp.data)
-          commit('SET_CREATE_LOADER',false)
+          commit('SET_CREATE_LOADER', false)
           resolve(true)
           return true
         }
         resolve(false)
-        commit('SET_CREATE_LOADER',false)
+        commit('SET_CREATE_LOADER', false)
       },
       (err) => {
         resolve(false)
-        commit('SET_CREATE_LOADER',false)
+        commit('SET_CREATE_LOADER', false)
+        throw new Error(err)
+      }
+    ));
+  },
+  DELETE_URL_SUMMARY: async ({ commit, rootState }: any, payload: any) => {
+    await new Promise(resolve => api.delete(`/remove`, payload).then(
+      (resp) => {
+        if (resp.status >= 200 && resp.status < 400) {
+          commit('SET_DELETED_URL', resp.data)
+          commit('SET_DELETED_LOADER', false)
+          resolve(true)
+          return true
+        }
+        resolve(false)
+        commit('SET_DELETED_LOADER', false)
+      },
+      (err) => {
+        resolve(false)
+        commit('SET_DELETED_LOADER', false)
         throw new Error(err)
       }
     ));

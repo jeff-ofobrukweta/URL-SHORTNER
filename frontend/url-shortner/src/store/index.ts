@@ -11,10 +11,12 @@ export default new Vuex.Store({
     state: {
         loader:false,
         createloding:false,
+        deleteloding:false,
     },
     getters: {
         getloading: (state: any) => state.loader,
         getcreateloading: (state: any) => state.createloding,
+        deleteloading: (state: any) => state.deleteloding,
     },
     mutations: {
         SET_LOADER(state: any, boolstate: boolean) {
@@ -22,6 +24,9 @@ export default new Vuex.Store({
         },
         SET_CREATE_LOADER(state: any, loading: boolean) {
             state.createloding = loading
+        },
+        SET_DELETED_LOADER(state: any, loading: boolean) {
+            state.deleteloding = loading
         },
     },
     modules: {

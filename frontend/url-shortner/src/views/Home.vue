@@ -7,9 +7,13 @@
           <ul class="inner-list" v-if="!getloading">
             <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
               <div class="truncate-word">{{value.shortUrl}}</div>
-              <div class="list-err-msg">unable to connect to server</div>
-              <img class="bin-loader" :src="require('@/assets/loading.svg')" alt="loading" />
-              <img class="bin" :src="require('@/icons/recycle-bin.svg')" alt="bin" />
+              <img
+                @click="()=>deleting(value)"
+                :class="[deleteloading ? 'disableClass' : '', 'bin']"
+                :disabled="deleteloading"
+                :src="require('@/icons/recycle-bin.svg')"
+                alt="bin"
+              />
             </li>
           </ul>
           <li class="item">
@@ -26,7 +30,7 @@
               >❯</button>
             </button>
           </li>
-          <ul v-if="getloading">
+          <ul v-if="getloading || deleteloading">
             <li>
               <img class="loader" :src="require('@/assets/loading.svg')" alt="loading" />
             </li>
@@ -40,13 +44,22 @@
           type="text"
           placeholder="Paste your link here..."
         />
-        <button :disabled="checkInput" @click="creating" :class="[checkInput ? 'disableClass' : '', 'submit urlButton']">
+        <button
+          :disabled="checkInput"
+          @click="creating"
+          :class="[checkInput ? 'disableClass' : '', 'submit urlButton']"
+        >
           <div>Submit</div>
-          <img v-if="!showChecklist" class="checklist" :src="require('@/icons/checklist.svg')" alt="check" />
+          <img
+            v-if="!showChecklist"
+            class="checklist"
+            :src="require('@/icons/checklist.svg')"
+            alt="check"
+          />
         </button>
         <div class="results_dialogue">
           <div class="main_dialogue">
-            <div v-if="getsingleUrl">{{getsingleUrl.appendedmessage.message}}</div>
+            <div class="list-err-msg" v-if="getsingleUrl">{{getsingleUrl.appendedmessage.message}}</div>
             <div v-else></div>
           </div>
         </div>
@@ -92,7 +105,14 @@ export default {
     this.pagination();
   },
   computed: {
-    ...mapGetters(["getAllUrl", "getsingleUrl", "getloading","getcreateloading"]),
+    ...mapGetters([
+      "getAllUrl",
+      "getsingleUrl",
+      "getloading",
+      "getcreateloading",
+      "deletesingleUrl",
+      "deleteloading",
+    ]),
     checkInput() {
       // check if it empty and if its a valid url
       const result =
@@ -110,16 +130,43 @@ export default {
       const condition = this.getloading || this.pageData.page == 1;
       return condition;
     },
-    showChecklist(){
-     const result =  !(this.getsingleUrl.appendedmessage.internalcode) || this.checkInput
-     return result
-    }
+    showChecklist() {
+      const result =
+        !this.getsingleUrl.appendedmessage.internalcode || this.checkInput;
+      return result;
+    },
   },
   methods: {
-    ...mapActions(["GET_URL_LIST_SUMMARY", "POST_URL_SUMMARY"]),
-    ...mapMutations(["SET_URL_SUMMARY", "SET_LOADER","SET_CREATE_LOADER"]),
+    ...mapActions([
+      "GET_URL_LIST_SUMMARY",
+      "POST_URL_SUMMARY",
+      "DELETE_URL_SUMMARY",
+    ]),
+    ...mapMutations([
+      "SET_DELETED_URL",
+      "SET_URL_SUMMARY",
+      "SET_LOADER",
+      "SET_CREATE_LOADER",
+      "SET_DELETED_LOADER",
+    ]),
 
-    deleting() {
+    async deleting(delItem) {
+      this.SET_DELETED_LOADER(true);
+      await this.DELETE_URL_SUMMARY(delItem)
+        .then(async () => {
+          const delayInMilliseconds = 1000; //1 second
+          setTimeout(()=> {
+            //your code to be executed after 1 second
+            this.SET_DELETED_LOADER(false);
+          }, delayInMilliseconds);
+          // make a call to fetch new state of the list
+          await this.GET_URL_LIST_SUMMARY(this.pageData);
+          return;
+        })
+        .catch((err) => {
+          this.SET_DELETED_LOADER(false);
+          throw new Error(err);
+        });
       return;
     },
     async pagination(value) {
@@ -153,18 +200,16 @@ export default {
     async creating() {
       this.SET_CREATE_LOADER(true);
       await this.POST_URL_SUMMARY(this.body)
-        .then(() => {
+        .then(async () => {
           this.SET_CREATE_LOADER(false);
           this.body.longUrl = this.getsingleUrl.result.shortUrl;
+          await this.GET_URL_LIST_SUMMARY(this.pageData);
           return;
         })
         .catch((err) => {
           this.SET_CREATE_LOADER(false);
           throw new Error(err);
         });
-    },
-    fetching() {
-      return;
     },
   },
 };
@@ -181,14 +226,13 @@ export default {
 body {
   margin: 0;
 }
-.list-err-msg{
-  width: 11rem;
-    font-size: 11px;
-    color: red;
-    font-weight: 500;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.list-err-msg {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bin {
@@ -198,9 +242,6 @@ body {
 .loader {
   width: 3rem;
   margin: 0px 50%;
-}
-.bin-loader {
-  width: 30px;
 }
 .truncate-word {
   width: 11rem;

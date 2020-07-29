@@ -1,6 +1,7 @@
 import { ApiController } from './abstract.api.controller'
 import { Base64 } from '../../config/utillity/utility.urshortner'
 import { UserModel } from '../../db/model/users.model'
+import bodyParser from 'body-parser';
 
 
 class UrlShortner extends ApiController {
@@ -61,15 +62,13 @@ class UrlShortner extends ApiController {
     deleteOption() {
         return async (req: any, res: any, next: any) => {
             try {
-                await UserModel.findByIdAndRemove(req.query.id, (err) => {
-                    if (err) return next(err);
-                    res.status(201).send({
-                        message: 'Deleted Report successfully!',
-                        internalcode: '01',
-                    });
-                    next()
-                    return
-                })
+                const { _id } = req.body
+                await UserModel.findByIdAndDelete(_id)
+                res.status(200).send({
+                    message: 'Deleted Report successfully!',
+                    internalcode: '01',
+                });
+                next()
                 return
             } catch (err) {
                 res.status(500).send({ message: err, internalcode: '00' })
