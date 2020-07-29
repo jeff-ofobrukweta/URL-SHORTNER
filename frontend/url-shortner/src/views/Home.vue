@@ -7,13 +7,17 @@
           <ul class="inner-list" v-if="!getloading">
             <li v-for="(value, index) in getAllUrl.records" :key="index" class="item">
               <div class="truncate-word">{{value.shortUrl}}</div>
-              <img
-                @click="()=>deleting(value)"
-                :class="[deleteloading ? 'disableClass' : '', 'bin']"
-                :disabled="deleteloading"
-                :src="require('@/icons/recycle-bin.svg')"
-                alt="bin"
-              />
+              <div class="left-item-list">
+                <div>{{formatDate(value.dateOfEntry)}}</div>
+                <img
+                style="margin-left:10px"
+                  @click="()=>deleting(value)"
+                  :class="[deleteloading ? 'disableClass' : '', 'bin']"
+                  :disabled="deleteloading"
+                  :src="require('@/icons/recycle-bin.svg')"
+                  alt="bin"
+                />
+              </div>
             </li>
           </ul>
           <li class="item">
@@ -47,7 +51,7 @@
         <button
           :disabled="checkInput"
           @click="creating"
-          :class="[checkInput ? 'disableClass' : '', 'submit urlButton']"
+          :class="[checkInput || getcreateloading ? 'disableClass' : '', 'submit urlButton']"
         >
           <div>Submit</div>
           <img
@@ -149,17 +153,22 @@ export default {
       "SET_CREATE_LOADER",
       "SET_DELETED_LOADER",
     ]),
+    formatDate(dateString) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    },
 
     async deleting(delItem) {
       this.SET_DELETED_LOADER(true);
       await this.DELETE_URL_SUMMARY(delItem)
         .then(async () => {
           const delayInMilliseconds = 1000; //1 second
-          setTimeout(()=> {
+          setTimeout(() => {
             //your code to be executed after 1 second
             this.SET_DELETED_LOADER(false);
           }, delayInMilliseconds);
           // make a call to fetch new state of the list
+          this.pageData.page = 1;
           await this.GET_URL_LIST_SUMMARY(this.pageData);
           return;
         })
@@ -225,6 +234,10 @@ export default {
 }
 body {
   margin: 0;
+}
+.left-item-list {
+  display: flex;
+  justify-content: space-between;
 }
 .list-err-msg {
   text-align: center;
@@ -304,7 +317,7 @@ body {
   list-style: none;
   padding: 10px;
   z-index: 2000;
-  width: 80%;
+  width: 90%;
   text-align: left;
   box-shadow: 0 7px 64px rgba(31, 32, 65, 0.1);
   transition: all 0.3s ease;

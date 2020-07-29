@@ -54,7 +54,7 @@ class UrlShortner extends ApiController {
                 return
             } catch (err) {
                 res.status(500).send({ message: err, internalcode: '00' })
-                throw new Error(err)
+                return
             }
         }
     }
